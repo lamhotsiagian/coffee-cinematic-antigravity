@@ -59,4 +59,5 @@ Since the preloader uses the `fetch` API to download the video, the file must be
 2. **Open the browser**:
    Navigate to:
    👉 **[http://localhost:3000/index.html](http://localhost:3000/index.html)**
-# coffee-cinematic-antigravity
+
+Readmore details about the promt and steps to generate the video and the code: https://aiengineeringinsider.substack.com/p/build-5000-insane-cinematic-website
