@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obsidian Roast | Volcanic Single-Origin Coffee</title>
+  <meta name="description" content="Born in fire, refined by time. Discover Obsidian Roast, a premium volcanic-soil single-origin coffee harvested from the slopes of Mount Agung.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Lenis Smooth Scroll CDN -->
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.18/dist/lenis.css">
+
+  <!-- Google Fonts: Playfair Display & Montserrat -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+    
+    :root {
+      --color-obsidian: #0b0b0c;
+      --color-gold: #f5c77a;
+      --color-gold-glow: rgba(245, 199, 122, 0.45);
+      --color-volcanic: #ff5e3a;
+      --color-volcanic-glow: rgba(255, 94, 58, 0.5);
+    }
+
+    body {
+      background-color: var(--color-obsidian);
+      color: #ffffff;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .font-serif {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-obsidian);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2a2e;
+      border-radius: 4px;
+      border: 2px solid var(--color-obsidian);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-gold);
+    }
+
+    /* Ambient Glows */
+    .glow-gold {
+      text-shadow: 0 0 20px var(--color-gold-glow);
+    }
+    .glow-volcanic {
+      text-shadow: 0 0 20px var(--color-volcanic-glow);
+    }
+
+    /* Navigation Dot Styling */
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(245, 199, 122, 0.15);
+      border: 1px solid rgba(245, 199, 122, 0.2);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      cursor: pointer;
+    }
+    .nav-dot:hover {
+      background-color: rgba(245, 199, 122, 0.8);
+      border-color: var(--color-gold);
+    }
+    .nav-dot.active {
+      background-color: var(--color-gold);
+      border-color: var(--color-gold);
+      transform: scale(1.3);
+    }
+    .nav-dot.active::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border: 1px solid var(--color-gold);
+      border-radius: 50%;
+      animation: pulse-ring 2.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    /* Glassmorphic Utilities */
+    .glass-card {
+      background: rgba(20, 20, 22, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Hide video until loaded */
+    #bg-video {
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+    #bg-video.ready {
+      opacity: 0.82; /* Brighter video presence */
+    }
+
+    /* Glow transitions */
+    .ambient-glow-zone {
+      transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+  </style>
+
+  <script>
+    // Tailwind Config customization
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+          },
+          colors: {
+            obsidian: {
+              DEFAULT: '#0B0B0C',
+              light: '#141416',
+              dark: '#060607',
+            },
+            gold: {
+              DEFAULT: '#F5C77A', // Brighter champagne gold
+              light: '#FFF0D4',
+              dark: '#C99E52',
+            },
+            volcanic: {
+              DEFAULT: '#FF5E3A', // Brighter lava orange
+              glow: '#FF7D54',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="antialiased">
+
+  <!-- ==================== 1. LOADING SCREEN OVERLAY ==================== -->
+  <div id="loader" class="fixed inset-0 bg-[#0B0B0C] z-[9999] flex flex-col justify-center items-center select-none px-6">
+    <div class="max-w-md w-full text-center flex flex-col items-center">
+      <!-- Animated Brand Monogram -->
+      <div class="mb-10 relative">
+        <div class="w-16 h-16 border border-[#F5C77A]/20 rounded-full flex items-center justify-center animate-[spin_8s_linear_infinite]">
+          <div class="w-12 h-12 border border-t-[#F5C77A] border-r-transparent border-b-transparent border-l-transparent rounded-full"></div>
+        </div>
+        <span class="absolute inset-0 flex items-center justify-center font-serif text-[#F5C77A] text-xl font-bold tracking-widest">O</span>
+      </div>
+      
+      <!-- Brand Title -->
+      <h2 class="font-serif text-[#F5C77A] text-2xl md:text-3xl tracking-[0.25em] uppercase font-bold mb-3 glow-gold">
+        Obsidian Roast
+      </h2>
+      <p class="text-gray-400 text-[10px] uppercase tracking-[0.3em] mb-12">
+        Born of Fire • Refined by Time
+      </p>
+
+      <!-- Progress Text & Bar -->
+      <div class="w-full max-w-[280px]">
+        <div class="flex justify-between items-center text-[10px] text-gray-300 uppercase tracking-widest mb-2 font-mono">
+          <span>Caching Elixir</span>
+          <span id="progress-text">0%</span>
+        </div>
+        <!-- Progress track -->
+        <div class="h-[1px] w-full bg-white/5 overflow-hidden relative">
+          <div id="progress-bar" class="h-full bg-[#F5C77A] w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== 2. FIXED BACKGROUND VIDEO CONTAINER ==================== -->
+  <div id="video-container" class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none select-none">
+    <!-- background video scrubbing target -->
+    <video id="bg-video" class="w-full h-full object-cover pointer-events-none" muted playsinline preload="auto">
+      <source src="final.mp4" type="video/mp4">
+    </video>
+    
+    <!-- Cinematic Overlay Gradients for Depth & Legibility -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(11,11,12,0.1)_0%,rgba(11,11,12,0.85)_100%)] z-10 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0B0B0C] via-transparent to-[#0B0B0C] z-10 pointer-events-none"></div>
+  </div>
+
+
+  <!-- ==================== 3. ATMOSPHERIC AMBIENT GLOWS ==================== -->
+  <!-- Fixed background glows that fade in/out matching the scroll triggers -->
+  <div id="ambient-glow-roast" class="ambient-glow-zone fixed inset-0 pointer-events-none z-10 opacity-0 bg-[radial-gradient(circle_at_right,rgba(255,94,58,0.08)_0%,transparent_60%)]"></div>
+  <div id="ambient-glow-elixir" class="ambient-glow-zone fixed inset-0 pointer-events-none z-10 opacity-0 bg-[radial-gradient(circle_at_left,rgba(245,199,122,0.08)_0%,transparent_60%)]"></div>
+
+
+  <!-- ==================== 4. FLOATING SIDE DOT NAVIGATION ==================== -->
+  <div class="fixed right-8 top-1/2 transform -translate-y-1/2 z-50 hidden md:flex flex-col space-y-6 select-none">
+    <div class="flex items-center justify-end space-x-3 group" onclick="scrollToSection('#hero')">
+      <span class="text-[9px] uppercase tracking-widest text-[#F5C77A]/0 group-hover:text-[#F5C77A]/80 transition duration-300 pointer-events-none">Intro</span>
+      <div class="nav-dot active"></div>
+    </div>
+    <div class="flex items-center justify-end space-x-3 group" onclick="scrollToSection('#origin')">
+      <span class="text-[9px] uppercase tracking-widest text-[#F5C77A]/0 group-hover:text-[#F5C77A]/80 transition duration-300 pointer-events-none">01 Origin</span>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="flex items-center justify-end space-x-3 group" onclick="scrollToSection('#roast')">
+      <span class="text-[9px] uppercase tracking-widest text-orange-400/0 group-hover:text-orange-400/80 transition duration-300 pointer-events-none">02 Roast</span>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="flex items-center justify-end space-x-3 group" onclick="scrollToSection('#pour')">
+      <span class="text-[9px] uppercase tracking-widest text-[#F5C77A]/0 group-hover:text-[#F5C77A]/80 transition duration-300 pointer-events-none">03 Pour</span>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="flex items-center justify-end space-x-3 group" onclick="scrollToSection('#elixir')">
+      <span class="text-[9px] uppercase tracking-widest text-[#F5C77A]/0 group-hover:text-[#F5C77A]/80 transition duration-300 pointer-events-none">04 Elixir</span>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="flex items-center justify-end space-x-3 group" onclick="scrollToSection('#products')">
+      <span class="text-[9px] uppercase tracking-widest text-[#F5C77A]/0 group-hover:text-[#F5C77A]/80 transition duration-300 pointer-events-none">Collection</span>
+      <div class="nav-dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ==================== 5. SCROLLABLE NARRATIVE OVERLAYS ==================== -->
+  <div id="scroll-container" class="relative z-20 w-full">
+    
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 w-full flex justify-between items-center px-8 md:px-16 py-8 z-40 select-none bg-gradient-to-b from-[#0B0B0C]/80 to-transparent backdrop-blur-xs">
+      <div class="font-serif text-[#F5C77A] text-xl md:text-2xl tracking-[0.25em] font-extrabold uppercase glow-gold">
+        Obsidian Roast
+      </div>
+      <nav class="hidden md:flex space-x-8 text-[10px] uppercase tracking-[0.3em] text-[#F5C77A]/70 font-semibold">
+        <a href="#origin" class="hover:text-[#F5C77A] transition duration-300">Origin</a>
+        <a href="#roast" class="hover:text-orange-400 transition duration-300">Roast</a>
+        <a href="#pour" class="hover:text-[#F5C77A] transition duration-300">Pour</a>
+        <a href="#elixir" class="hover:text-[#F5C77A] transition duration-300">Elixir</a>
+        <a href="#products" class="hover:text-[#F5C77A] transition duration-300">Collection</a>
+      </nav>
+      <a href="#products" class="border border-[#F5C77A]/40 text-[#F5C77A] px-5 py-2 text-[10px] uppercase tracking-[0.25em] font-bold hover:bg-[#F5C77A] hover:text-[#0B0B0C] hover:border-[#F5C77A] transition duration-500 rounded-sm">
+        Reserve
+      </a>
+    </header>
+
+    <!-- SECTION 0: HERO LANDING -->
+    <section id="hero" class="h-screen flex flex-col justify-between items-center text-center px-6 py-28 relative select-none">
+      <div class="flex-grow flex flex-col justify-center items-center max-w-4xl z-30">
+        <span class="text-[#F5C77A] text-[10px] md:text-xs uppercase tracking-[0.45em] mb-4 font-bold animate-pulse">
+          Volcanic-Soil Cultivated Single Origin
+        </span>
+        <h1 class="font-serif text-4xl md:text-8xl text-white tracking-[0.08em] mb-6 uppercase leading-tight font-black drop-shadow-2xl">
+          Obsidian <span class="text-[#F5C77A] glow-gold">Roast</span>
+        </h1>
+        <div class="w-12 h-[1px] bg-[#F5C77A]/50 my-4"></div>
+        <p class="text-gray-300 text-xs md:text-sm tracking-widest font-light leading-relaxed max-w-md">
+          Born in fire, refined by time. A premium volcanic-soil espresso harvested from the ash-covered peaks of Mount Agung.
+        </p>
+      </div>
+
+      <!-- Descend Cue -->
+      <div class="z-30 flex flex-col items-center cursor-pointer" onclick="scrollToSection('#origin')">
+        <span class="text-[9px] uppercase tracking-[0.3em] text-[#F5C77A]/50 mb-3">Descend</span>
+        <div class="w-[18px] h-[32px] border border-[#F5C77A]/30 rounded-full flex justify-center p-1">
+          <div class="w-[2px] h-[6px] bg-[#F5C77A]/80 rounded-full animate-bounce"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: THE ORIGIN -->
+    <section id="origin" class="min-h-screen flex items-center px-8 md:px-24 py-32 relative">
+      <div class="max-w-xl z-30 origin-content">
+        <div class="flex items-center space-x-4 mb-4">
+          <span class="h-[1px] w-6 bg-[#F5C77A]"></span>
+          <span class="text-[#F5C77A] text-[10px] uppercase tracking-[0.3em] font-bold">01 / The Origin</span>
+        </div>
+        <h2 class="font-serif text-3xl md:text-5xl text-white mb-6 uppercase tracking-wider leading-tight">
+          The Obsidian Soil
+        </h2>
+        <p class="text-gray-300 text-xs md:text-sm leading-relaxed tracking-wider mb-8 font-light">
+          High above the cloud line, on the fertile slopes of Mount Agung, our coffee cherries ripen in mineral-rich volcanic ash. This obsidian-dark soil infuses the beans with rare notes of dark cacao, smoke, and an intense earthy finish.
+        </p>
+        <div class="grid grid-cols-2 gap-8 border-t border-white/10 pt-8">
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Elevation</span>
+            <span class="font-serif text-lg md:text-xl text-white tracking-widest">1,700m ASL</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Coordinates</span>
+            <span class="font-serif text-lg md:text-xl text-white tracking-widest">8.3405° S, 115.5089° E</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: THE ROAST -->
+    <section id="roast" class="min-h-screen flex items-center justify-end px-8 md:px-24 py-32 relative">
+      <div class="max-w-xl z-30 text-right roast-content">
+        <div class="flex items-center justify-end space-x-4 mb-4">
+          <span class="text-orange-400 text-[10px] uppercase tracking-[0.3em] font-bold">02 / The Roast</span>
+          <span class="h-[1px] w-6 bg-orange-400"></span>
+        </div>
+        <h2 class="font-serif text-3xl md:text-5xl text-white mb-6 uppercase tracking-wider leading-tight">
+          Born in Fire
+        </h2>
+        <p class="text-gray-300 text-xs md:text-sm leading-relaxed tracking-wider mb-8 font-light">
+          Our beans are subjected to a rigorous roasting process that mirrors the volcanic origins of the soil. As the roasting fire cracks the shell, a burst of energy releases the locked-in natural oils, bringing forward a rich, smoky aroma and caramelized complexity.
+        </p>
+        <div class="grid grid-cols-2 gap-8 border-t border-white/10 pt-8 text-right">
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Profile</span>
+            <span class="font-serif text-lg md:text-xl text-white tracking-widest">Double-Cracked</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Roast Temp</span>
+            <span class="font-serif text-lg md:text-xl text-orange-400 tracking-widest glow-volcanic">228°C (442°F)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: THE POUR -->
+    <section id="pour" class="min-h-screen flex items-center px-8 md:px-24 py-32 relative">
+      <div class="max-w-xl z-30 pour-content">
+        <div class="flex items-center space-x-4 mb-4">
+          <span class="h-[1px] w-6 bg-[#F5C77A]"></span>
+          <span class="text-[#F5C77A] text-[10px] uppercase tracking-[0.3em] font-bold">03 / The Pour</span>
+        </div>
+        <h2 class="font-serif text-3xl md:text-5xl text-white mb-6 uppercase tracking-wider leading-tight">
+          Cascading Alchemy
+        </h2>
+        <p class="text-gray-300 text-xs md:text-sm leading-relaxed tracking-wider mb-8 font-light">
+          Precision extraction. We grind the obsidian beans to a velvet sand. When pure volcanic water meets the grounds, a cascade of deep brown notes is unleashed, locking in a pure flavor untainted by bitterness.
+        </p>
+        <div class="grid grid-cols-2 gap-8 border-t border-white/10 pt-8">
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Grind Size</span>
+            <span class="font-serif text-lg md:text-xl text-white tracking-widest">Fine Sand</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Water Ratio</span>
+            <span class="font-serif text-lg md:text-xl text-white tracking-widest">1:15 Precision</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: THE ELIXIR -->
+    <section id="elixir" class="min-h-screen flex items-center justify-end px-8 md:px-24 py-32 relative">
+      <div class="max-w-xl z-30 text-right elixir-content">
+        <div class="flex items-center justify-end space-x-4 mb-4">
+          <span class="text-[#F5C77A] text-[10px] uppercase tracking-[0.3em] font-bold">04 / The Elixir</span>
+          <span class="h-[1px] w-6 bg-[#F5C77A]"></span>
+        </div>
+        <h2 class="font-serif text-3xl md:text-5xl text-white mb-6 uppercase tracking-wider leading-tight">
+          The Golden Crema
+        </h2>
+        <p class="text-gray-300 text-xs md:text-sm leading-relaxed tracking-wider mb-8 font-light">
+          The final cup. A thick, swirling amber crema rests on a body of obsidian espresso. It is not just coffee; it is a ritual, a liquid testament to the power of the mountain. One sip, and the volcanics awaken.
+        </p>
+        <div class="grid grid-cols-2 gap-8 border-t border-white/10 pt-8 text-right">
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Crema Depth</span>
+            <span class="font-serif text-lg md:text-xl text-white tracking-widest">4.5mm Velvet</span>
+          </div>
+          <div>
+            <span class="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">Notes</span>
+            <span class="font-serif text-lg md:text-xl text-[#F5C77A] tracking-widest glow-gold">Cacao & Ember</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: PRODUCTS SECTION (Solid background overlaying video) -->
+    <section id="products" class="relative z-30 bg-[#0B0B0C] min-h-screen px-8 md:px-24 py-32 border-t border-white/5 select-none">
+      
+      <!-- Section Title -->
+      <div class="max-w-4xl mx-auto text-center mb-24">
+        <span class="text-[#F5C77A] text-[10px] md:text-xs uppercase tracking-[0.3em] font-bold block mb-4 animate-pulse">The Obsidian Collection</span>
+        <h2 class="font-serif text-4xl md:text-6xl text-white uppercase tracking-wider leading-tight">
+          Acquire the Elixir
+        </h2>
+        <div class="w-12 h-[1px] bg-[#F5C77A] mx-auto mt-6"></div>
+      </div>
+
+      <!-- 3-Card Product Grid -->
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Product Card 1: VESUVIUS -->
+        <div class="group relative bg-[#141416]/70 backdrop-blur-xl border border-white/[0.06] hover:border-[#F5C77A]/40 rounded-sm overflow-hidden transition-all duration-700 flex flex-col justify-between h-full p-8 shadow-2xl hover:shadow-[0_15px_40px_rgba(245,199,122,0.15)]"
+             onmouseenter="setHoverState('vesuvius', true)" onmouseleave="setHoverState('vesuvius', false)">
+          <!-- Ambient gold hover light -->
+          <div class="absolute inset-0 bg-gradient-to-b from-[#F5C77A]/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-all duration-750 pointer-events-none"></div>
+          
+          <div>
+            <!-- Abstract topographic canvas -->
+            <div class="relative w-full aspect-[4/5] bg-black/75 rounded-sm mb-8 flex items-center justify-center overflow-hidden border border-white/5 shadow-inner">
+              <canvas id="product-canvas-vesuvius" class="absolute inset-0 w-full h-full opacity-75"></canvas>
+              <div class="relative z-10 flex flex-col items-center text-center p-4">
+                <span class="font-serif text-[#F5C77A] text-xl tracking-[0.15em] uppercase mb-1">Vesuvius</span>
+                <span class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold font-mono">Volcanic Roast I</span>
+              </div>
+              <div class="absolute inset-4 border border-[#F5C77A]/20 pointer-events-none"></div>
+            </div>
+            
+            <div class="flex justify-between items-start mb-4">
+              <h3 class="font-serif text-2xl text-white uppercase tracking-wider group-hover:text-[#F5C77A] transition duration-300">Vesuvius</h3>
+              <span class="font-serif text-[#F5C77A] text-xl">$48</span>
+            </div>
+            <span class="text-[9px] text-gray-400 uppercase tracking-widest block mb-4 font-semibold">Profile: Dark / Double Cracked</span>
+            <p class="text-gray-400 text-xs tracking-wider font-light leading-relaxed mb-8">
+              A robust, full-bodied dark roast. Concentrated notes of rich baker's chocolate, charred cedar, and volcanic ash. Bold, smooth, and uncompromising.
+            </p>
+          </div>
+
+          <button class="w-full bg-transparent border border-[#F5C77A]/40 hover:border-[#F5C77A] text-[#F5C77A] py-3.5 text-[10px] uppercase tracking-widest hover:bg-[#F5C77A] hover:text-[#0B0B0C] hover:shadow-[0_0_20px_rgba(245,199,122,0.3)] transition duration-500 rounded-sm font-bold">
+            Acquire Roast
+          </button>
+        </div>
+
+        <!-- Product Card 2: ETNA -->
+        <div class="group relative bg-[#141416]/70 backdrop-blur-xl border border-white/[0.06] hover:border-orange-500/40 rounded-sm overflow-hidden transition-all duration-700 flex flex-col justify-between h-full p-8 shadow-2xl hover:shadow-[0_15px_40px_rgba(255,94,58,0.15)]"
+             onmouseenter="setHoverState('etna', true)" onmouseleave="setHoverState('etna', false)">
+          <!-- Ambient red hover light -->
+          <div class="absolute inset-0 bg-gradient-to-b from-orange-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-all duration-750 pointer-events-none"></div>
+          
+          <div>
+            <!-- Abstract topographic canvas -->
+            <div class="relative w-full aspect-[4/5] bg-black/75 rounded-sm mb-8 flex items-center justify-center overflow-hidden border border-white/5 shadow-inner">
+              <canvas id="product-canvas-etna" class="absolute inset-0 w-full h-full opacity-75"></canvas>
+              <div class="relative z-10 flex flex-col items-center text-center p-4">
+                <span class="font-serif text-orange-400 text-xl tracking-[0.15em] uppercase mb-1">Etna</span>
+                <span class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold font-mono">Volcanic Roast II</span>
+              </div>
+              <div class="absolute inset-4 border border-orange-500/20 pointer-events-none"></div>
+            </div>
+            
+            <div class="flex justify-between items-start mb-4">
+              <h3 class="font-serif text-2xl text-white uppercase tracking-wider group-hover:text-orange-400 transition duration-300">Etna</h3>
+              <span class="font-serif text-orange-400 text-xl">$44</span>
+            </div>
+            <span class="text-[9px] text-gray-400 uppercase tracking-widest block mb-4 font-semibold">Profile: Medium / City+</span>
+            <p class="text-gray-400 text-xs tracking-wider font-light leading-relaxed mb-8">
+              A complex, medium roast. Balanced notes of black cherry, wild forest berries, raw brown sugar, and hints of warm volcanic minerality. Perfect harmony.
+            </p>
+          </div>
+
+          <button class="w-full bg-transparent border border-orange-500/40 hover:border-orange-500 text-orange-400 py-3.5 text-[10px] uppercase tracking-widest hover:bg-orange-500 hover:text-[#0B0B0C] hover:shadow-[0_0_20px_rgba(255,94,58,0.3)] transition duration-500 rounded-sm font-bold">
+            Acquire Roast
+          </button>
+        </div>
+
+        <!-- Product Card 3: KRAKATOA -->
+        <div class="group relative bg-[#141416]/70 backdrop-blur-xl border border-white/[0.06] hover:border-[#F5C77A]/40 rounded-sm overflow-hidden transition-all duration-700 flex flex-col justify-between h-full p-8 shadow-2xl hover:shadow-[0_15px_40px_rgba(245,199,122,0.15)]"
+             onmouseenter="setHoverState('krakatoa', true)" onmouseleave="setHoverState('krakatoa', false)">
+          <!-- Ambient gold hover light -->
+          <div class="absolute inset-0 bg-gradient-to-b from-[#F5C77A]/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-all duration-750 pointer-events-none"></div>
+          
+          <div>
+            <!-- Abstract topographic canvas -->
+            <div class="relative w-full aspect-[4/5] bg-black/75 rounded-sm mb-8 flex items-center justify-center overflow-hidden border border-white/5 shadow-inner">
+              <canvas id="product-canvas-krakatoa" class="absolute inset-0 w-full h-full opacity-75"></canvas>
+              <div class="relative z-10 flex flex-col items-center text-center p-4">
+                <span class="font-serif text-[#F5C77A] text-xl tracking-[0.15em] uppercase mb-1">Krakatoa</span>
+                <span class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold font-mono">Volcanic Roast III</span>
+              </div>
+              <div class="absolute inset-4 border border-[#F5C77A]/20 pointer-events-none"></div>
+            </div>
+            
+            <div class="flex justify-between items-start mb-4">
+              <h3 class="font-serif text-2xl text-white uppercase tracking-wider group-hover:text-[#F5C77A] transition duration-300">Krakatoa</h3>
+              <span class="font-serif text-[#F5C77A] text-xl">$52</span>
+            </div>
+            <span class="text-[9px] text-gray-400 uppercase tracking-widest block mb-4 font-semibold">Profile: Light / Cinnamon</span>
+            <p class="text-gray-400 text-xs tracking-wider font-light leading-relaxed mb-8">
+              A bright, floral light roast. Notes of fresh lemon peel, jasmine flower, crisp stone fruit, and a distinct silica mineral finish. Refreshing and clean.
+            </p>
+          </div>
+
+          <button class="w-full bg-transparent border border-[#F5C77A]/40 hover:border-[#F5C77A] text-[#F5C77A] py-3.5 text-[10px] uppercase tracking-widest hover:bg-[#F5C77A] hover:text-[#0B0B0C] hover:shadow-[0_0_20px_rgba(245,199,122,0.3)] transition duration-500 rounded-sm font-bold">
+            Acquire Roast
+          </button>
+        </div>
+        
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="mt-40 border-t border-white/5 pt-16 flex flex-col md:flex-row justify-between items-center text-gray-500 text-[10px] uppercase tracking-widest select-none max-w-7xl mx-auto w-full">
+        <div class="flex items-center space-x-6 mb-6 md:mb-0">
+          <span class="font-serif text-[#F5C77A] text-base tracking-[0.2em] font-extrabold uppercase">Obsidian Roast</span>
+          <span class="hidden md:inline">|</span>
+          <span>© 2026 Obsidian Roast. All rights reserved.</span>
+        </div>
+        
+        <div class="flex space-x-8 mb-6 md:mb-0">
+          <a href="#" class="hover:text-white transition duration-300">Tasting Room</a>
+          <a href="#" class="hover:text-white transition duration-300">Sourcing Ethics</a>
+          <a href="#" class="hover:text-white transition duration-300">Privacy & Terms</a>
+        </div>
+        
+        <div class="text-right">
+          <span>Mount Agung Plantation, Bali</span>
+        </div>
+      </footer>
+
+    </section>
+
+  </div>
+
+
+  <!-- ==================== 6. JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // Register GSAP plugins
+    gsap.registerPlugin(ScrollTrigger);
+
+    const videoSrc = 'coffee.mp4';
+    const videoEl = document.getElementById('bg-video');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+    const loader = document.getElementById('loader');
+
+    // Canvas configuration
+    const hoverStates = {
+      vesuvius: { hover: false, time: 0, canvasId: 'product-canvas-vesuvius', color: '#F5C77A' },
+      etna: { hover: false, time: 0, canvasId: 'product-canvas-etna', color: '#FF5E3A' },
+      krakatoa: { hover: false, time: 0, canvasId: 'product-canvas-krakatoa', color: '#F5C77A' }
+    };
+
+    function setHoverState(key, isHovered) {
+      if (hoverStates[key]) {
+        hoverStates[key].hover = isHovered;
+      }
+    }
+
+    // Smooth Scroll Helper
+    function scrollToSection(id) {
+      const el = document.querySelector(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Page navigation sync helpers
+    const dots = document.querySelectorAll('.nav-dot');
+    const sectionsList = ['#hero', '#origin', '#roast', '#pour', '#elixir', '#products'];
+
+    function syncNavigation() {
+      sectionsList.forEach((id, index) => {
+        ScrollTrigger.create({
+          trigger: id,
+          start: 'top 50%',
+          end: 'bottom 50%',
+          onToggle: (self) => {
+            if (self.isActive) {
+              dots.forEach(dot => dot.classList.remove('active'));
+              if (dots[index]) {
+                dots[index].classList.add('active');
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // Attach click events to nav dots
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        scrollToSection(sectionsList[index]);
+      });
+    });
+
+    // ==================== A. VIDEO STREAMING PRELOADER ====================
+    fetch(videoSrc)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const contentLength = response.headers.get('content-length');
+        if (!contentLength) {
+          console.warn('Content-Length header not available. Direct loading fallback.');
+          return response.blob();
+        }
+        
+        const total = parseInt(contentLength, 10);
+        let loaded = 0;
+        
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              const reader = response.body.getReader();
+              function read() {
+                reader.read().then(({ done, value }) => {
+                  if (done) {
+                    controller.close();
+                    return;
+                  }
+                  loaded += value.byteLength;
+                  const percent = Math.round((loaded / total) * 100);
+                  
+                  // Update Loading Progress UI
+                  progressText.innerText = `${percent}%`;
+                  progressBar.style.width = `${percent}%`;
+                  
+                  controller.enqueue(value);
+                  read();
+                }).catch(error => {
+                  console.error('ReadableStream read error:', error);
+                  controller.error(error);
+                });
+              }
+              read();
+            }
+          })
+        ).blob();
+      })
+      .then(blob => {
+        const objectUrl = URL.createObjectURL(blob);
+        videoEl.src = objectUrl;
+        
+        // Wait for metadata to be parsed (so duration is read correctly)
+        videoEl.addEventListener('loadedmetadata', () => {
+          videoEl.classList.add('ready');
+          videoEl.play().then(() => {
+            videoEl.pause(); // Pre-warm the hardware decoder, then pause for scrubbing
+            videoEl.currentTime = 0;
+            
+            // Fade out loader and initialize
+            fadeLoader();
+          }).catch(() => {
+            // Browsers requiring interaction fallback
+            videoEl.currentTime = 0;
+            fadeLoader();
+          });
+        });
+      })
+      .catch(error => {
+        console.error('Fetch preloader failed. Falling back to native buffering:', error);
+        // Fallback directly to native loading
+        videoEl.src = videoSrc;
+        videoEl.addEventListener('loadedmetadata', () => {
+          videoEl.classList.add('ready');
+          fadeLoader();
+        });
+      });
+
+    function fadeLoader() {
+      gsap.to(loader, {
+        opacity: 0,
+        duration: 1.2,
+        ease: 'power3.out',
+        onComplete: () => {
+          loader.style.display = 'none';
+          document.body.style.overflow = 'auto'; // Re-enable scrolling
+          initScrollAnimations();
+        }
+      });
+    }
+
+    // Disable scroll during loading screen
+    document.body.style.overflow = 'hidden';
+
+    // ==================== B. GSAP SCROLL SCENARIO ENGINE ====================
+    function initScrollAnimations() {
+      
+      // Initialize Lenis Smooth Scroll
+      const lenis = new Lenis({
+        duration: 1.4,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth premium curve
+        smoothWheel: true,
+        orientation: 'vertical',
+      });
+
+      // Synchronize Lenis scroll with GSAP ScrollTrigger
+      lenis.on('scroll', ScrollTrigger.update);
+      
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0);
+
+      // 1. Sync video playback with total page scroll
+      const videoDuration = videoEl.duration || 30.03;
+      
+      gsap.to(videoEl, {
+        currentTime: videoDuration,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#scroll-container',
+          start: 'top top',
+          end: 'bottom bottom',
+          endTrigger: '#products',
+          scrub: 1.2, // Adds inertia for smooth seeking
+        }
+      });
+
+      // Fade out background video container as products section enters to make transition seamless
+      gsap.to('#video-container', {
+        opacity: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#products',
+          start: 'top bottom',
+          end: 'top 50%',
+          scrub: true,
+        }
+      });
+
+      // 2. Ambient glows triggers
+      // Roast section glows amber
+      ScrollTrigger.create({
+        trigger: '#roast',
+        start: 'top 60%',
+        end: 'bottom 40%',
+        onToggle: (self) => {
+          gsap.to('#ambient-glow-roast', { opacity: self.isActive ? 1 : 0, duration: 1.2 });
+        }
+      });
+
+      // Elixir section glows golden
+      ScrollTrigger.create({
+        trigger: '#elixir',
+        start: 'top 60%',
+        end: 'bottom 40%',
+        onToggle: (self) => {
+          gsap.to('#ambient-glow-elixir', { opacity: self.isActive ? 1 : 0, duration: 1.2 });
+        }
+      });
+
+      // 3. Individual Text reveals for sections (Smooth slide and overlap)
+      const sections = [
+        { trigger: '#origin', content: '.origin-content' },
+        { trigger: '#roast', content: '.roast-content' },
+        { trigger: '#pour', content: '.pour-content' },
+        { trigger: '#elixir', content: '.elixir-content' }
+      ];
+
+      sections.forEach((sec) => {
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: sec.trigger,
+            start: 'top 85%',
+            end: 'bottom 15%',
+            scrub: true,
+          }
+        })
+        .fromTo(sec.content, 
+          { opacity: 0, y: 80 }, 
+          { opacity: 1, y: 0, ease: 'power1.out', duration: 1.2 }
+        )
+        .to(sec.content, 
+          { opacity: 0, y: -80, ease: 'power1.in', duration: 1.2 }, 
+          '+=1.8' // Stationary dwell time in the center viewport
+        );
+      });
+
+      // Synchronize floating navigation indicators
+      syncNavigation();
+      
+      // Initialize topography animations
+      initTopography();
+    }
+
+
+    // ==================== C. BESPOKE TOPOGRAPHY RENDERER ====================
+    function initTopography() {
+      let animationFrameId;
+
+      function render() {
+        Object.keys(hoverStates).forEach(key => {
+          const state = hoverStates[key];
+          
+          // Increment animation timer (faster when hovered)
+          if (state.hover) {
+            state.time += 0.015;
+          } else {
+            state.time += 0.003;
+          }
+          
+          drawTopography(state.canvasId, state.color, state.time);
+        });
+        
+        animationFrameId = requestAnimationFrame(render);
+      }
+
+      function drawTopography(canvasId, color, time) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        
+        // Dynamic resizing to prevent blurry vectors
+        if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
+          canvas.width = rect.width * dpr;
+          canvas.height = rect.height * dpr;
+          ctx.scale(dpr, dpr);
+        }
+        
+        const width = rect.width;
+        const height = rect.height;
+        
+        ctx.clearRect(0, 0, width, height);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.0; // Brighter and thicker lines
+        
+        // Concentric topographic elevation lines
+        const linesCount = 14;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        
+        for (let i = 1; i <= linesCount; i++) {
+          ctx.beginPath();
+          const baseRadius = i * (Math.min(width, height) / (linesCount + 2.5));
+          ctx.globalAlpha = 0.06 + (i / linesCount) * 0.22; // Brighter opacity values
+          
+          // Glow properties
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 10; // Extra glow blur for premium aesthetics
+          
+          const pointsCount = 48;
+          for (let p = 0; p <= pointsCount; p++) {
+            const angle = (p / pointsCount) * Math.PI * 2;
+            
+            // Multi-frequency wave formula simulating complex terrain curves
+            const wave1 = Math.sin(angle * 4 + i * 0.4 + time * 0.8) * 10;
+            const wave2 = Math.cos(angle * 2.5 - i * 0.2 + time * 0.4) * 6;
+            const wave3 = Math.sin(angle * 7 + i + time * 1.2) * 2.5;
+            
+            const radius = baseRadius + wave1 + wave2 + wave3;
+            
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            
+            if (p === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+
+      // Initial resize and trigger loop
+      render();
+
+      // Clean up blur on resize
+      window.addEventListener('resize', () => {
+        Object.keys(hoverStates).forEach(key => {
+          const state = hoverStates[key];
+          drawTopography(state.canvasId, state.color, state.time);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
